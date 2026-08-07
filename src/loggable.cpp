@@ -51,6 +51,15 @@ LogLevel Sinker::get_level() const noexcept {
 }
 
 void Sinker::dispatch(const LogMessage &message) noexcept {
+    static thread_local bool is_dispatching = false;
+    if (is_dispatching) {
+        return;
+    }
+    is_dispatching = true;
+    struct DispatchGuard {
+        ~DispatchGuard() { is_dispatching = false; }
+    } guard;
+
     if (_running.load(std::memory_order_acquire) && _queue) {
         // Async path: enqueue (drops oldest if full)
         _queue->push(message);
