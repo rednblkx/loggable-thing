@@ -233,6 +233,8 @@ public:
    */
   [[nodiscard]] SinkerMetrics get_metrics() const noexcept;
 
+  [[nodiscard]] os::TaskHandle get_task() const noexcept { return _task; }
+
 private:
   Sinker() = default;
 

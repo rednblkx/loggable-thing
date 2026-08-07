@@ -111,6 +111,8 @@ public:
      */
     virtual void task_delete(TaskHandle task) noexcept = 0;
 
+    virtual TaskHandle task_get_current() noexcept = 0;
+
     // --- Timing ---
 
     /**
