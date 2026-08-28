@@ -243,7 +243,7 @@ private:
   mutable std::mutex _sinkers_mutex;
 
   // Async infrastructure
-  static constexpr size_t QUEUE_CAPACITY = 32;
+  static constexpr size_t QUEUE_CAPACITY = 64;
   std::unique_ptr<RingBuffer<LogMessage, QUEUE_CAPACITY>> _queue;
   std::atomic<bool> _running{false};
   std::atomic<bool> _shutdown_requested{false};
