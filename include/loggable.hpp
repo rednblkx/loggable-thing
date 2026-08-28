@@ -245,8 +245,9 @@ private:
   // Async infrastructure
   static constexpr size_t QUEUE_CAPACITY = 64;
   std::unique_ptr<RingBuffer<LogMessage, QUEUE_CAPACITY>> _queue;
-  std::atomic<bool> _running{false};
-  std::atomic<bool> _shutdown_requested{false};
+    std::atomic<bool> _running{false};
+    std::atomic<bool> _shutdown_requested{false};
+    size_t _last_reported_dropped{0}; // Worker-only: watermark for drop reporting
 
   os::TaskHandle _task{};
   static void _task_entry(void *arg) noexcept;

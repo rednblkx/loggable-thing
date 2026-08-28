@@ -93,6 +93,7 @@ void Sinker::init(const SinkerConfig &config) noexcept {
 
     _shutdown_requested.store(false, std::memory_order_release);
     _queue = std::make_unique<RingBuffer<LogMessage, QUEUE_CAPACITY>>(backend);
+    _last_reported_dropped = 0;
 
     os::TaskConfig task_cfg{
         .name = "log_dispatch",
@@ -188,9 +189,10 @@ void Sinker::_process_queue() noexcept {
         }
 
         auto metrics = get_metrics();
-        if (metrics.dropped_count > 0) {
-            fmt::print(fg(fmt::color::orange), "[{}][W][{}][{}:{}] Dropped {} log messages\n", os::get_backend()->get_time_ms(), "Loggable::Sinker", __func__, __LINE__, metrics.dropped_count);
-            metrics.dropped_count = 0;
+        if (metrics.dropped_count > _last_reported_dropped) {
+            const auto dropped = metrics.dropped_count - _last_reported_dropped;
+            _last_reported_dropped = metrics.dropped_count;
+            fmt::print(fg(fmt::color::orange), "[{}][W][{}][{}:{}] Dropped {} log messages\n", os::get_backend()->get_time_ms(), "Loggable::Sinker", __func__, __LINE__, dropped);
         }
 
         if (_shutdown_requested.load(std::memory_order_acquire) &&
