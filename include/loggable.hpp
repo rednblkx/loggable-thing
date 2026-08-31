@@ -127,7 +127,7 @@ struct SinkerMetrics {
 struct SinkerConfig {
   size_t task_stack_size = 4096;
   int task_priority = 10;
-  int task_core = -1; ///< -1 = any core
+  int task_core = 1; ///< -1 = any core
 };
 
 /**
