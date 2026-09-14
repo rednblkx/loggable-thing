@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <memory>
 #include <mutex>
 #include <string_view>
@@ -192,7 +193,9 @@ void Sinker::_process_queue() noexcept {
         if (metrics.dropped_count > _last_reported_dropped) {
             const auto dropped = metrics.dropped_count - _last_reported_dropped;
             _last_reported_dropped = metrics.dropped_count;
-            fmt::print(fg(fmt::color::orange), "[{}][W][{}][{}:{}] Dropped {} log messages\n", os::get_backend()->get_time_ms(), "Loggable::Sinker", __func__, __LINE__, dropped);
+            fmt::memory_buffer buf;
+            fmt::format_to(fmt::appender(buf), fmt::fg(fmt::color::orange), "[{}][W][{}][{}:{}] Dropped {} log messages\n", os::get_backend()->get_time_ms(), "Loggable::Sinker", __func__, __LINE__, dropped);
+            std::fwrite(buf.data(), 1, buf.size(), stdout);
         }
 
         if (_shutdown_requested.load(std::memory_order_acquire) &&
